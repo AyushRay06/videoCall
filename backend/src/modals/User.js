@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-
+import bcrypt from "bcryptjs"
 const UserSchema = new mongoose.Schema(
   {
     fullName: {
@@ -40,6 +40,28 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    friends: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 )
+
+const User = mongoose.modelNames("User", UserSchema)
+
+//pre-hook(ie Do this before savinf the user data)
+
+UserSchema.pre("save", async (next) => {
+  try {
+    const salt = await bcrypt.genSalt(10)
+    this.password = await bcrypt.hash(this.password, salt)
+    next()
+  } catch (error) {
+    next(error)
+  }
+})
+
+export default User
