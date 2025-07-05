@@ -50,8 +50,6 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-const User = mongoose.modelNames("User", UserSchema)
-
 //pre-hook(ie Do this before savinf the user data)
 
 UserSchema.pre("save", async (next) => {
@@ -64,4 +62,10 @@ UserSchema.pre("save", async (next) => {
   }
 })
 
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  const isPasswordCorrect = await bcrypt.compare(enteredPassword, this.password)
+  return isPasswordCorrect
+}
+
+const User = mongoose.modelNames("User", UserSchema)
 export default User
