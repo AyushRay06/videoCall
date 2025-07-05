@@ -28,7 +28,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    learningLanhuage: {
+    learningLanguage: {
       type: String,
       default: "",
     },
@@ -50,7 +50,7 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-//pre-hook(ie Do this before savinf the user data)
+//pre-hook(ie Do this before saving the user data)
 
 UserSchema.pre("save", async (next) => {
   try {

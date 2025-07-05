@@ -1,6 +1,8 @@
+import { upstreamUser } from "../lib/stream"
 import User from "../modals/User"
 import jwt from "jsonwebtoken"
 
+// -------------------------signup----------------------------------
 export const signup = async (req, res) => {
   try {
     const { fullName, email, password } = req.body
@@ -36,6 +38,19 @@ export const signup = async (req, res) => {
       password,
       profilePic: randomAvatar,
     })
+
+    // Create user in stream as well
+
+    try {
+      await upstreamUser({
+        id: newUser._id,
+        fullName: newUser.fullName,
+        profilePic: newUser.profilePic || "",
+      })
+    } catch (error) {
+      console.log("Error while upsearting user into stream", error)
+    }
+
     // user created now assigning it a token(ist creat5e token then send it in the cookies)
     // tokebn creation
     const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
@@ -56,6 +71,8 @@ export const signup = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" })
   }
 }
+
+// --------------------login-------------------------------
 
 export const login = async (req, res) => {
   try {
@@ -92,10 +109,31 @@ export const login = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" })
   }
 }
+
+// --------------------logout-------------------------------
 export const logout = () => {
   try {
     res.clearCookie("jwt")
 
     res.status(200).json({ success: true, message: "Logout successful" })
+  } catch (error) {}
+}
+
+// -----------------------onboarding----------------------
+
+export const onboarding = async (req, res) => {
+  try {
+    const {
+      fullName,
+      bio,
+      profilePic,
+      nativeLanguage,
+      learningLanguage,
+      location,
+    } = req.body
+
+    if (!nativeLanguage || !learningLanguage || !location) {
+      return res.status(400).json({ message: "Missing required fields." })
+    }
   } catch (error) {}
 }
