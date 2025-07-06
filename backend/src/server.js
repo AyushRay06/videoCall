@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser"
 import cors from "cors"
 
 import authRoutes from "./routes/auth.routes.js"
+import userRoutes from "./routes/user.route.js"
 import { connectDB } from "./lib/db.js"
 // import userRoutes from "./routes/user.routes.js"
 // import chatRoutes from "./routes/chat.routes.js"
@@ -23,8 +24,8 @@ app.use(express.json())
 app.use(cookieParser())
 
 app.use("/api/auth", authRoutes)
+app.use("/api/user", userRoutes)
 // app.use("/api/chat", chatRoutes)
-// app.use("/api/user", userRoutes)
 
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}`)
