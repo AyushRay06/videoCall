@@ -1,3 +1,4 @@
+import FriendRequest from "../modals/friendRequest"
 import User from "../modals/User"
 
 export const getRecommendedUsers = async (req, res) => {
@@ -37,6 +38,58 @@ export const getMyFriends = async (req, res) => {
     res.status(200).json(friends)
   } catch (error) {
     console.log("Error in getMyFriends controller", error.message)
+    res.status(500).json({ message: "Internal Server Error" })
+  }
+}
+
+export const sendFriendRequest = async (req, res) => {
+  try {
+    const myId = req.user._id
+    const { id: recipientId } = req.params
+
+    // Prevent sending request to my self
+
+    if (myId === recipientId) {
+      return res.status(404).json({ message: "Invalid request" })
+    }
+
+    // Check if the recipent exist
+
+    const recipent = await User.findById(recipientId)
+
+    if (!recipent) {
+      return res.status(404).json({ message: "Invalid request" })
+    }
+
+    // Checks if the user is already friends with the recipient
+    if (recipent.friends.includes(myId)) {
+      return res
+        .status(400)
+        .json({ message: "You are already friends with this user" })
+    }
+
+    // Check if the request already exist
+    const existingrequest = await FriendRequest.findOne({
+      $or: [
+        { sender: myId, recipient: recipientId },
+        { sender: recipientId, recipient: myId },
+      ],
+    })
+
+    if (existingrequest) {
+      return res.status(400).json({
+        message: "Requerst already exist between the sender and the recipient.",
+      })
+    }
+
+    const friendRequest = await FriendRequest.create({
+      sender: myId,
+      recipient: recipientId,
+    })
+
+    res.status(200).json(friendRequest)
+  } catch (error) {
+    console.log("Error in sendFriendRequest controller", error.message)
     res.status(500).json({ message: "Internal Server Error" })
   }
 }
