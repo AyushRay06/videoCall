@@ -44,7 +44,7 @@ export const signup = async (req, res) => {
     try {
       await upstreamUser({
         id: newUser._id,
-        fullName: newUser.fullName,
+        name: newUser.fullName,
         profilePic: newUser.profilePic || "",
       })
     } catch (error) {
@@ -123,17 +123,71 @@ export const logout = () => {
 
 export const onboarding = async (req, res) => {
   try {
-    const {
-      fullName,
-      bio,
-      profilePic,
-      nativeLanguage,
-      learningLanguage,
-      location,
-    } = req.body
+    const userId = req.user._id
+    const { fullName, bio, nativeLanguage, learningLanguage, location } =
+      req.body
 
-    if (!nativeLanguage || !learningLanguage || !location) {
-      return res.status(400).json({ message: "Missing required fields." })
+    if (
+      !fullName ||
+      !bio ||
+      !nativeLanguage ||
+      !learningLanguage ||
+      !location
+    ) {
+      return res.status(400).json({
+        message: "Missing required fields.",
+        missingFields: [
+          !fullName && "fullName",
+          !bio && "bio",
+          !nativeLanguage && "nativeLanguage",
+          !learningLanguage && "learningLanguage",
+          !location && "location",
+        ].filter(Boolean),
+      })
     }
-  } catch (error) {}
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        // fullName,
+        // bio,
+        // location,
+        // nativeLanguage,
+        // learningLanguage,
+        // equivalent to :
+        ...req.body,
+        isOnboarded: true,
+      },
+      { new: true }
+    )
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    // updating user for stream(stream related logic not needed if not using stream)
+
+    try {
+      await upstreamUser({
+        userId: updatedUser._id,
+        name: updatedUser.fullName,
+        image: updatedUser.profilePic || "",
+      })
+      console.log(
+        `Stream user updated after onboarding for ${updatedUser.fullName}`
+      )
+    } catch (streamError) {
+      console.log(
+        "Error updating Stream user during onboarding:",
+        streamError.message
+      )
+    }
+
+    // -------------------------------------------------------------------
+
+    res.status(200).json({ success: true, user: updatedUser })
+  } catch (error) {
+    console.log("Error in Onboarding Controller!!!", error)
+    res.status(500).json({ message: "Internal server Error." })
+  }
 }
