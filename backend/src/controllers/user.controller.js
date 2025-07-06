@@ -128,6 +128,20 @@ export const acceptFriendRequest = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" })
   }
 }
+// TODO:need to check if correct or not
+export const rejectFriendRequest = async (req, res) => {
+  try {
+    const userId = req.user.id
+    const requestId = req.params
+
+    const request = await FriendRequest.findById(requestId)
+    if (!request) {
+      return res.status(400).json({ message: "Request does not exist" })
+    }
+
+    await FriendRequest.findByIdAndDelete(requestId)
+  } catch (error) {}
+}
 
 export const getFriendRequests = async (req, res) => {
   try {
