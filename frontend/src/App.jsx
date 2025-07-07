@@ -11,20 +11,6 @@ import toast, { Toaster } from "react-hot-toast"
 const App = () => {
   return (
     <div className="h-screen" data-theme="night">
-      <button
-        onClick={() => {
-          toast.success("Hello from toast")
-        }}
-      >
-        Create Toast success
-      </button>
-      <button
-        onClick={() => {
-          toast.error("Hello from toast")
-        }}
-      >
-        Create Toast success
-      </button>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<SignupPage />} />
