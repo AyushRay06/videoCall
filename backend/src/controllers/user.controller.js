@@ -1,5 +1,5 @@
-import FriendRequest from "../modals/friendRequest"
-import User from "../modals/User"
+import FriendRequest from "../modals/friendRequest.js"
+import User from "../modals/User.js"
 
 export const getRecommendedUsers = async (req, res) => {
   try {

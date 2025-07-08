@@ -1,36 +1,45 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import React, { useState } from "react"
-import { completeOnboarding } from "../lib/api"
+import { useState } from "react"
 import useAuthUser from "../hooks/useAuthUser"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import toast from "react-hot-toast"
+import { completeOnboarding } from "../lib/api"
+import {
+  LoaderIcon,
+  MapPinIcon,
+  ShipWheelIcon,
+  ShuffleIcon,
+} from "lucide-react"
+import { LANGUAGES } from "../constants"
 
-export const Onboardingpage = () => {
-  const queryClient = useQueryClient()
+const OnboardingPage = () => {
   const { authUser } = useAuthUser()
+  const queryClient = useQueryClient()
 
-  const [onBoardingData, setOnBoardingData] = useState({
-    fullName: "" || authUser?.fullName,
-    bio: "",
-    nativeLanguage: "",
-    learningLanguage: "",
-    location: "",
-    profilePic: "" || authUser?.profilePic,
+  const [formState, setFormState] = useState({
+    fullName: authUser?.fullName || "",
+    bio: authUser?.bio || "",
+    nativeLanguage: authUser?.nativeLanguage || "",
+    learningLanguage: authUser?.learningLanguage || "",
+    location: authUser?.location || "",
+    profilePic: authUser?.profilePic || "",
   })
-  const { mutation: onboardingMutation, isPending } = useMutation({
+
+  const { mutate: onboardingMutation, isPending } = useMutation({
     mutationFn: completeOnboarding,
     onSuccess: () => {
-      toast.success("Profile onboarded successfully.")
+      toast.success("Profile onboarded successfully")
       queryClient.invalidateQueries({ queryKey: ["authUser"] })
     },
 
-    onError: () => {
+    onError: (error) => {
       toast.error(error.response.data.message)
     },
   })
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onboardingMutation()
+
+    onboardingMutation(formState)
   }
 
   const handleRandomAvatar = () => {
@@ -54,7 +63,6 @@ export const Onboardingpage = () => {
             <div className="flex flex-col items-center justify-center space-y-4">
               {/* IMAGE PREVIEW */}
               <div className="size-32 rounded-full bg-base-300 overflow-hidden">
-                {" "}
                 {formState.profilePic ? (
                   <img
                     src={formState.profilePic}
@@ -67,6 +75,7 @@ export const Onboardingpage = () => {
                   </div>
                 )}
               </div>
+
               {/* Generate Random Avatar BTN */}
               <div className="flex items-center gap-2">
                 <button
@@ -79,38 +88,37 @@ export const Onboardingpage = () => {
                 </button>
               </div>
             </div>
+
             {/* FULL NAME */}
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Full Name</span>
               </label>
               <input
-                name="fullName"
                 type="text"
-                placeholder="Your full name"
-                value={onBoardingData.fullName}
+                name="fullName"
+                value={formState.fullName}
                 onChange={(e) =>
-                  setOnBoardingData({
-                    ...onBoardingData,
-                    fullName: e.target.value,
-                  })
+                  setFormState({ ...formState, fullName: e.target.value })
                 }
                 className="input input-bordered w-full"
+                placeholder="Your full name"
               />
             </div>
-            {/* Bio */}
+
+            {/* BIO */}
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Bio</span>
               </label>
-              <input
+              <textarea
                 name="bio"
-                type="text"
-                placeholder="Tell others about yourself and your language learning goals"
-                className="textarea textarea-bordered h-24"
+                value={formState.bio}
                 onChange={(e) =>
-                  setOnBoardingData({ ...onBoardingData, bio: e.target.value })
+                  setFormState({ ...formState, bio: e.target.value })
                 }
+                className="textarea textarea-bordered h-24"
+                placeholder="Tell others about yourself and your language learning goals"
               />
             </div>
 
@@ -123,10 +131,10 @@ export const Onboardingpage = () => {
                 </label>
                 <select
                   name="nativeLanguage"
-                  value={onBoardingData.nativeLanguage}
+                  value={formState.nativeLanguage}
                   onChange={(e) =>
-                    setOnBoardingData({
-                      ...onBoardingData,
+                    setFormState({
+                      ...formState,
                       nativeLanguage: e.target.value,
                     })
                   }
@@ -148,10 +156,10 @@ export const Onboardingpage = () => {
                 </label>
                 <select
                   name="learningLanguage"
-                  value={onBoardingData.learningLanguage}
+                  value={formState.learningLanguage}
                   onChange={(e) =>
-                    setOnBoardingData({
-                      ...onBoardingData,
+                    setFormState({
+                      ...formState,
                       learningLanguage: e.target.value,
                     })
                   }
@@ -166,6 +174,7 @@ export const Onboardingpage = () => {
                 </select>
               </div>
             </div>
+
             {/* LOCATION */}
             <div className="form-control">
               <label className="label">
@@ -176,18 +185,16 @@ export const Onboardingpage = () => {
                 <input
                   type="text"
                   name="location"
-                  value={onBoardingData.location}
+                  value={formState.location}
                   onChange={(e) =>
-                    setOnBoardingData({
-                      ...onBoardingData,
-                      location: e.target.value,
-                    })
+                    setFormState({ ...formState, location: e.target.value })
                   }
                   className="input input-bordered w-full pl-10"
                   placeholder="City, Country"
                 />
               </div>
             </div>
+
             {/* SUBMIT BUTTON */}
 
             <button
@@ -213,3 +220,4 @@ export const Onboardingpage = () => {
     </div>
   )
 }
+export default OnboardingPage

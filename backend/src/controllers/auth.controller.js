@@ -1,13 +1,13 @@
-import { upstreamUser } from "../lib/stream"
-import User from "../modals/User"
+import { upsertStreamUser } from "../lib/stream.js"
+import User from "../modals/User.js"
 import jwt from "jsonwebtoken"
 
 // -------------------------signup----------------------------------
 export const signup = async (req, res) => {
   try {
     const { fullName, email, password } = req.body
-    if (!fullName || !email || password) {
-      return res.status(401).json({ msh: "All fields are required" })
+    if (!fullName || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" })
     }
 
     if (password.length < 6) {
@@ -42,18 +42,19 @@ export const signup = async (req, res) => {
     // Create user in stream as well
 
     try {
-      await upstreamUser({
-        id: newUser._id,
+      await upsertStreamUser({
+        id: newUser._id.toString(),
         name: newUser.fullName,
         profilePic: newUser.profilePic || "",
       })
+      console.log(`Stream user created for ${newUser.fullName}`)
     } catch (error) {
       console.log("Error while upsearting user into stream", error)
     }
 
     // user created now assigning it a token(ist creat5e token then send it in the cookies)
     // tokebn creation
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "7d",
     })
 
@@ -68,7 +69,7 @@ export const signup = async (req, res) => {
     res.status(200).json({ success: true, user: newUser })
   } catch (error) {
     console.log("Error in signup controller", error)
-    res.status(500).json({ message: "Internal Server Error" })
+    res.status(500).json({ message: "Intervbvnal Server Error" })
   }
 }
 
@@ -92,7 +93,7 @@ export const login = async (req, res) => {
     if (!isPasswordCorrect) {
       return res.status(401).json({ message: "Invalid email or password" })
     }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
       expiresIn: "7d",
     })
 
@@ -111,12 +112,15 @@ export const login = async (req, res) => {
 }
 
 // --------------------logout-------------------------------
-export const logout = () => {
+export const logout = (req, res) => {
   try {
     res.clearCookie("jwt")
 
     res.status(200).json({ success: true, message: "Logout successful" })
-  } catch (error) {}
+  } catch (error) {
+    console.log("Error in logout controller", error)
+    res.status(500).json({ message: "Internal Server Error" })
+  }
 }
 
 // -----------------------onboarding----------------------
@@ -168,7 +172,7 @@ export const onboarding = async (req, res) => {
     // updating user for stream(stream related logic not needed if not using stream)
 
     try {
-      await upstreamUser({
+      await upsertStreamUser({
         userId: updatedUser._id,
         name: updatedUser.fullName,
         image: updatedUser.profilePic || "",

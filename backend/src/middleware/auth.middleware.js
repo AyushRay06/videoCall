@@ -1,30 +1,30 @@
-import User from "../modals/User"
 import jwt from "jsonwebtoken"
+import User from "../modals/User.js"
 
 export const protectRoute = async (req, res, next) => {
   try {
-    const token = res.cookie.jwt
+    const token = req.cookies.jwt
 
     if (!token) {
       return res
         .status(401)
-        .json({ message: "Unauthorized-token not provided" })
+        .json({ message: "Unauthorized - No token provided" })
     }
 
-    const decode = jwt.verify(token, process.env.JWT_SECRET)
-    if (!decode) {
-      return res.status(401).json({ message: "Unauthorized-Invalid Token." })
-    }
-    // here we can access userId as we passed userId as paylod in the token
-    //   jwt.sign({ userId: newUser._id }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY)
 
-    const user = await User.findById(decode.userId).select("-password")
+    if (!decoded) {
+      return res.status(401).json({ message: "Unauthorized - Invalid token" })
+    }
+
+    const user = await User.findById(decoded.userId).select("-password")
 
     if (!user) {
-      return res.status(401).json({ message: "User not fond" })
+      return res.status(401).json({ message: "Unauthorized - User not found" })
     }
 
     req.user = user
+
     next()
   } catch (error) {
     console.log("Error in protectRoute middleware", error)

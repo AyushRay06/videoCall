@@ -1,6 +1,7 @@
 import mongoose from "mongoose"
 import bcrypt from "bcryptjs"
-const UserSchema = new mongoose.Schema(
+
+const userSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
@@ -50,9 +51,9 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-//pre-hook(ie Do this before saving the user data)
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next()
 
-UserSchema.pre("save", async (next) => {
   try {
     const salt = await bcrypt.genSalt(10)
     this.password = await bcrypt.hash(this.password, salt)
@@ -67,5 +68,6 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   return isPasswordCorrect
 }
 
-const User = mongoose.model("User", UserSchema)
+const User = mongoose.model("User", userSchema)
+
 export default User
