@@ -42,7 +42,7 @@ const App = () => {
         />
         <Route
           path="/call"
-          element={isAuthenticated ? <CallPage /> : <Navigate to="" />}
+          element={isAuthenticated ? <CallPage /> : <Navigate to="/" />}
         />
         <Route path="/notification" element={<NotificationPage />} />
         <Route path="/chat" element={<ChatPage />} />
