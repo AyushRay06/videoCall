@@ -1,6 +1,6 @@
 import { generateStreamToken } from "../lib/stream.js"
 
-export const generateStreamTokenCon = async (req, res) => {
+export const getStreamToken = async (req, res) => {
   try {
     const userId = req.user.id
     const token = generateStreamToken(userId)

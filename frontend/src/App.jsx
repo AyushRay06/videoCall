@@ -73,6 +73,8 @@ const App = () => {
           }
         />
         <Route
+          // the id in the route is dynamic and represent the user id in the DB.
+          // it is accessed in the ChatPage component using useParams from react-router
           path="/call/:id"
           element={
             isAuthenticated && isOnboarded ? (
@@ -84,6 +86,9 @@ const App = () => {
         />
 
         <Route
+          // the id in the route is dynamic and represent the user id in the DB.
+          // it is accessed in the ChatPage component using useParams from react-router
+
           path="/chat/:id"
           element={
             isAuthenticated && isOnboarded ? (
