@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { login } from "../lib/api.js"
+import { login } from "../lib/api"
 
-const useLogin = async () => {
+const useLogin = () => {
   const queryClient = useQueryClient()
   const { mutate, isPending, error } = useMutation({
     mutationFn: login,

@@ -17,6 +17,7 @@ import { useThemeStore } from "./store/useThemeStore.js"
 
 const App = () => {
   const { isLoading, authUser } = useAuthUser()
+  // Zustan state managment
   const { theme } = useThemeStore()
 
   const isAuthenticated = Boolean(authUser)
