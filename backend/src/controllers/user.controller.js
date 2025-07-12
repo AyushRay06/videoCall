@@ -142,19 +142,19 @@ export const getFriendRequests = async (req, res) => {
     const userId = req.user.id
 
     // get all the pendding request where current user is the recipient ans get some senders details
-    const incomingRequest = await FriendRequest.find({
-      recipent: userId,
+    const incomingReqs = await FriendRequest.find({
+      recipient: userId,
       status: "pending",
     }).populate("sender", "fullName profilePic nativeLanguage learningLanguage")
     // get all the request where the CurrentUser is the sender and the status is accepetd
-    const acceptedRequest = await FriendRequest.find({
+    const acceptedReqs = await FriendRequest.find({
       sender: userId,
       status: "accepted",
     }).populate("recipient", "fullName profilePic")
 
-    res.status(200).json({ incomingRequest, acceptedRequest })
+    res.status(200).json({ incomingReqs, acceptedReqs })
   } catch (error) {
-    console.log("Error in getPendingFriendRequests controller", error.message)
+    console.log("Error in getFriendRequests controller", error.message)
     res.status(500).json({ message: "Internal Server Error" })
   }
 }

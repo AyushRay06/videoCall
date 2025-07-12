@@ -12,6 +12,7 @@ export const login = async (loginData) => {
 
 export const logout = async () => {
   const response = await axiosInstance.post("/auth/logout")
+  console.log("logout  axios-api")
   return response.data
 }
 export const getAuthUser = async () => {

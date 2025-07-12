@@ -54,9 +54,13 @@ export const signup = async (req, res) => {
 
     // user created now assigning it a token(ist creat5e token then send it in the cookies)
     // tokebn creation
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "7d",
-    })
+    const token = jwt.sign(
+      { userId: newUser._id },
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: "7d",
+      }
+    )
 
     // sending token
     res.cookie("jwt", token, {
@@ -89,7 +93,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Inalid creentials" })
     }
 
-    const isPasswordCorrect = await User.matchPassword(password)
+    const isPasswordCorrect = await user.matchPassword(password)
     if (!isPasswordCorrect) {
       return res.status(401).json({ message: "Invalid email or password" })
     }
@@ -115,7 +119,7 @@ export const login = async (req, res) => {
 export const logout = (req, res) => {
   try {
     res.clearCookie("jwt")
-
+    console.log("execution reached to Logout out Controler")
     res.status(200).json({ success: true, message: "Logout successful" })
   } catch (error) {
     console.log("Error in logout controller", error)
